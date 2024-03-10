@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Q
 from .models import Product
 from .forms import ProductSearchForm
 
@@ -9,7 +10,12 @@ def index(request):
 
 	if form.is_valid():
 		qstring = form.cleaned_data.get('search_string')
-		products = products.filter(title__icontains=qstring)
+		if qstring:
+			qtext = None
+			for word in qstring.split(" "):
+				qword = Q( title__icontains = word ) | Q( category__name__icontains = word ) | Q( tags__name__icontains = word)
+				qtext = (qtext & qword) if qtext else qword		
+			products = products.filter( qtext ).distinct() 
 
 		qcategory = form.cleaned_data.get('category')
 		if qcategory:
