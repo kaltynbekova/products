@@ -6,8 +6,11 @@ from .forms import ProductSearchForm
 # Create your views here.
 def index(request):
 	products = Product.objects.all()
-	form = ProductSearchForm(request.GET)
 
+	if 'reset' in request.GET:
+		return render(request, 'index.html', {'products': products, 'form': ProductSearchForm()})
+
+	form = ProductSearchForm(request.GET)
 	if form.is_valid():
 		qstring = form.cleaned_data.get('search_string')
 		if qstring:

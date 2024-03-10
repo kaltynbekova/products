@@ -1,8 +1,8 @@
 from django import forms
 from .models import Category, Tag, Product
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout,Submit,Reset
-from crispy_forms.bootstrap import InlineCheckboxes
+from crispy_forms.layout import Layout,Submit,Reset, Div
+from crispy_forms.bootstrap import InlineCheckboxes, FormActions
 
 TAG_FILTER_CHOICES =( 
     ("any", "Include any"), 
@@ -25,12 +25,10 @@ class ProductSearchForm(forms.Form):
 		self.helper.form_method = 'GET'
 		self.helper.use_custom_control = True 
 
-		self.helper.add_input(Submit('submit', 'Search', css_class='btn btn-dark mr-3'))
-		self.helper.add_input(Reset('reset', 'Reset filters', css_class='btn btn-light mr-3'))
-
 		self.helper.layout = Layout(
 			'search_string', 
 			'category',
 			'tags_filter_rules',
-			InlineCheckboxes('tags', css_class="tag-checkboxes")
+			InlineCheckboxes('tags', css_class="tag-checkboxes"),
+			FormActions(Submit('submit', 'Search', css_class='btn btn-dark mr-3'), Submit('reset', 'Reset filters', css_class='btn btn-light mr-3'), css_class="text-center")
 		)
