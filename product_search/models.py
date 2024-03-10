@@ -8,6 +8,7 @@ class Category(models.Model):
 
 class Tag(models.Model):
 	name = models.CharField(max_length=100)
+	group = models.CharField(max_length=50, default='other')
 
 	def __str__(self):
 		return self.name

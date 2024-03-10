@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.db.models import Q
+from django.db.models import Q, Count
 from .models import Product
 from .forms import ProductSearchForm
 
@@ -23,6 +23,18 @@ def index(request):
 
 		qtags = form.cleaned_data.get('tags')
 		if qtags:
-			products = products.filter(tags__in=qtags)
+			rule = form.cleaned_data.get('tags_filter_rules')
+			if rule == "all":
+				#product must match all selected tags
+				tagged_products = products.annotate(c=Count('tags')).filter(c__gte=len(qtags))
+				for tag in qtags:
+					tagged_products = tagged_products.filter(tags=tag)
+				products = tagged_products
+			elif rule == "none":
+				#product must not include any of the selected tags
+				products = products.exclude(tags__in=qtags)
+			else:
+				# product can match at least one of selected tags
+				products = products.filter(tags__in=qtags)
 
 	return render(request, 'index.html', {'products': products, 'form': form})
